@@ -1,3 +1,5 @@
+import { serializeId } from "./id";
+
 export interface Location {
   x: number;
   y: number;
@@ -74,15 +76,16 @@ const kingdomIdMap: Readonly<Record<number, string | undefined>> = {
   4: "The Storm Islands",
 };
 
-function stringifyKingdomId(kingdomId: number): string {
+export function stringifyKingdomId(kingdomId: number): string {
   return kingdomIdMap[kingdomId] ?? "Unknown";
 }
 
-function formatPosition(x: number, y: number): string {
+export function formatPosition(x: number, y: number): string {
   return `${x}:${y}`;
 }
 
 export interface Item {
+  id: string;
   time: string;
   cooldown: string;
   kingdom: string;
@@ -90,6 +93,7 @@ export interface Item {
 }
 
 export interface PriorityItem {
+  id: string;
   age: string;
   kingdom: string;
   position: string;
@@ -111,6 +115,7 @@ export function stringifyLocations(
       );
     })
     .map(({ x, y, kingdomId, time }) => ({
+      id: serializeId({ kingdomId, x, y }),
       age: formatDuration(currentTime - time)!,
       kingdom: stringifyKingdomId(kingdomId),
       position: formatPosition(x, y),
@@ -120,6 +125,7 @@ export function stringifyLocations(
     .filter(({ time }) => time >= currentTime)
     .sort(({ time: a }, { time: b }) => a - b)
     .map(({ x, y, kingdomId, time }) => ({
+      id: serializeId({ kingdomId, x, y }),
       time: formatDate(new Date(time * 1000)),
       cooldown: formatDuration(time - currentTime)!,
       kingdom: stringifyKingdomId(kingdomId),
