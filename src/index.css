@@ -1,8 +1,9 @@
 #root {
-  width: stretch;
-  height: stretch;
+    width: stretch;
+    height: stretch;
 }
 
-body {
-  margin: 0;
+html, body {
+    height: 100%;
+    margin: 0;
 }
