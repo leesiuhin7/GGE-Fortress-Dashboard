@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { stringifyLocations, type Location } from "./data";
+import {
+  sortLocations,
+  stringifyPriorityLocation,
+  type Location,
+} from "./data";
 import IgnoreManager from "./ignore";
 import IgnoreSettings from "./IgnoreSettings";
 import styles from "./LocationDisplay.module.css";
@@ -19,7 +23,8 @@ export default function LocationDisplay({
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const [priorityItems, items] = stringifyLocations(locations);
+  const { normal: normalLocations, priority: priorityLocations } =
+    sortLocations(locations);
 
   // Tick every second to update timers
   useEffect(() => {
@@ -56,7 +61,7 @@ export default function LocationDisplay({
           <span style={{ fontSize: 32 }}>Active</span>
           <div style={{ overflowY: "auto" }}>
             <PriorityTable
-              priorityItems={priorityItems}
+              priorityItems={priorityLocations.map(stringifyPriorityLocation)}
               ignoreManager={ignoreManager}
               onSelect={setSelectedId}
             />
@@ -66,7 +71,7 @@ export default function LocationDisplay({
           <span style={{ fontSize: 32 }}>Pending</span>
           <div style={{ overflowY: "auto", height: "stretch" }}>
             <Table
-              items={items}
+              locations={normalLocations}
               ignoreManager={ignoreManager}
               onSelect={setSelectedId}
             />

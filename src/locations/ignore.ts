@@ -6,8 +6,10 @@ export default class IgnoreManager {
     this.idMap.set(id, timestamp);
   }
 
-  public isIgnored(id: string): boolean {
-    return (this.idMap.get(id) ?? Number.MIN_VALUE) > Date.now();
+  public isIgnored(id: string, time?: number): boolean {
+    return (
+      (this.idMap.get(id) ?? Number.NEGATIVE_INFINITY) > (time ?? Date.now())
+    );
   }
 
   public save() {

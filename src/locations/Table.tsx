@@ -1,12 +1,12 @@
-import type { Item } from "./data";
+import { stringifyLocation, type Location } from "./data";
 import type IgnoreManager from "./ignore";
 
 export default function Table({
-  items,
+  locations,
   ignoreManager,
   onSelect,
 }: {
-  items: Item[];
+  locations: Location[];
   ignoreManager: IgnoreManager;
   onSelect: (id: string) => void;
 }) {
@@ -33,21 +33,27 @@ export default function Table({
         </tr>
       </thead>
       <tbody>
-        {items.map(({ id, time, cooldown, kingdom, position }) => (
-          <tr
-            key={id}
-            onClick={() => onSelect(id)}
-            style={{
-              backgroundColor:
-                ignoreManager.isIgnored(id) ? "rgb(192, 192, 192)" : undefined,
-            }}
-          >
-            <td style={{ paddingRight: 50, paddingLeft: 50 }}>{time}</td>
-            <td style={{ paddingRight: 50 }}>{cooldown}</td>
-            <td style={{ paddingRight: 50 }}>{kingdom}</td>
-            <td style={{ paddingRight: 50 }}>{position}</td>
-          </tr>
-        ))}
+        {locations.map((location) => {
+          const { id, time, cooldown, kingdom, position } =
+            stringifyLocation(location);
+          return (
+            <tr
+              key={id}
+              onClick={() => onSelect(id)}
+              style={{
+                backgroundColor:
+                  ignoreManager.isIgnored(id, location.time * 1000) ?
+                    "rgb(192, 192, 192)"
+                  : undefined,
+              }}
+            >
+              <td style={{ paddingRight: 50, paddingLeft: 50 }}>{time}</td>
+              <td style={{ paddingRight: 50 }}>{cooldown}</td>
+              <td style={{ paddingRight: 50 }}>{kingdom}</td>
+              <td style={{ paddingRight: 50 }}>{position}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

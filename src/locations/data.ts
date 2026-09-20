@@ -99,38 +99,50 @@ export interface PriorityItem {
   position: string;
 }
 
-export function stringifyLocations(
-  locations: Location[],
-): [PriorityItem[], Item[]] {
+export function sortLocations(locations: Location[]): {
+  normal: Location[];
+  priority: Location[];
+} {
   const currentTime = Date.now() / 1000; // Convert to seconds
+  return {
+    normal: locations
+      .filter(({ time }) => time >= currentTime)
+      .sort(({ time: a }, { time: b }) => a - b),
+    priority: locations
+      .filter(({ time }) => time < currentTime)
+      .sort((location1, location2) => {
+        return (
+          location1.kingdomId - location2.kingdomId ||
+          // Distance from the center of the map
+          Math.hypot(location1.x - 643, location1.y - 643) -
+            Math.hypot(location2.x - 643, location2.y - 643)
+        );
+      }),
+  };
+}
 
-  const priorityItems: PriorityItem[] = locations
-    .filter(({ time }) => time < currentTime)
-    .sort((location1, location2) => {
-      return (
-        location1.kingdomId - location2.kingdomId ||
-        // Distance from the center of the map
-        Math.hypot(location1.x - 643, location1.y - 643) -
-          Math.hypot(location2.x - 643, location2.y - 643)
-      );
-    })
-    .map(({ x, y, kingdomId, time }) => ({
-      id: serializeId({ kingdomId, x, y }),
-      age: formatDuration(currentTime - time)!,
-      kingdom: stringifyKingdomId(kingdomId),
-      position: formatPosition(x, y),
-    }));
+export function stringifyLocation({ x, y, kingdomId, time }: Location): Item {
+  const currentTime = Date.now() / 1000; // Convert to seconds
+  return {
+    id: serializeId({ kingdomId, x, y }),
+    time: formatDate(new Date(time * 1000)),
+    cooldown: formatDuration(time - currentTime)!,
+    kingdom: stringifyKingdomId(kingdomId),
+    position: formatPosition(x, y),
+  };
+}
 
-  const items: Item[] = locations
-    .filter(({ time }) => time >= currentTime)
-    .sort(({ time: a }, { time: b }) => a - b)
-    .map(({ x, y, kingdomId, time }) => ({
-      id: serializeId({ kingdomId, x, y }),
-      time: formatDate(new Date(time * 1000)),
-      cooldown: formatDuration(time - currentTime)!,
-      kingdom: stringifyKingdomId(kingdomId),
-      position: formatPosition(x, y),
-    }));
-
-  return [priorityItems, items];
+export function stringifyPriorityLocation({
+  x,
+  y,
+  kingdomId,
+  time,
+}: Location): PriorityItem {
+  const currentTime = Date.now() / 1000; // Convert to seconds
+  return {
+    id: serializeId({ kingdomId, x, y }),
+    age: formatDuration(currentTime - time)!,
+    kingdom: stringifyKingdomId(kingdomId),
+    position: formatPosition(x, y),
+  };
 }
