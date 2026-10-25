@@ -60,8 +60,8 @@ function formatDuration(duration: number): string | undefined {
 }
 
 function formatDate(date: Date): string {
-  const month = padNumber(date.getMonth(), 2);
-  const day = padNumber(date.getDay(), 2);
+  const month = padNumber(date.getMonth() + 1, 2);
+  const day = padNumber(date.getDate(), 2);
   const hours = padNumber(date.getHours(), 2);
   const minutes = padNumber(date.getMinutes(), 2);
   const seconds = padNumber(date.getSeconds(), 2);
